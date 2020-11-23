@@ -1,0 +1,17 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block title %}
+    {% if title %}{{ title }} - Mago{% else %}Welcome to Mago{% endif %}
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-md navbar-dark fixed-top" style="background-color: #e3f2fd;">
+    <a class="navbar-brand" href="{{ url_for('index') }}">Mago</a>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    <a class="btn" href="{{ login_url }}" style="background-color: #f2c40d; color: black;">Sign in</a>
+</div>
+{% endblock %}

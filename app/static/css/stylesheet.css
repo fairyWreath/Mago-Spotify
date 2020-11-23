@@ -1,0 +1,111 @@
+.option-btn {
+    background-color: #ff0080; 
+    color: white;
+}
+
+.option-btn-library {
+    background-color: #ecc113; 
+    color: white;
+}
+
+.option-btn-artists {
+    background-color: #1fad1f; 
+    color: white;
+}
+
+.option-btn-genres {
+    background-color: palevioletred;
+    color: white;
+}
+
+.info-lead {
+    color: palevioletred;
+}
+
+.info-container {
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+.info-jumbotron {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    width: 1000px;
+    margin: 0 auto;
+}
+
+.form-jumbotron {
+    /* margin-left: 200px;
+    margin-right: 200px; */
+    padding-top: 5px;
+    padding-bottom: 5px;
+    width: 1000px;
+    margin: 0 auto;
+}
+
+.row-buffer { 
+    margin: 7px; 
+}
+
+.col-centered{
+    float: none;
+    margin: 0 auto;
+}
+
+.profile-nav-img {
+    padding-top: 3px;
+    padding-bottom: 0px;
+    padding-right: 0px;
+    height: 45px;
+    width: 45px;
+}
+
+
+.focus-jumbotron {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    /* background-color: #f9e2f9; */
+    background-color: #fbeefb;
+    width: 1000px;
+    /* height: 500px; */
+    margin: 0 auto;
+}
+
+.profile-name {
+    padding-left: 0px;
+}
+
+.profile-img {
+    height: 200px;
+    width: 200px;
+    padding-left: 0px;
+    margin-top: 10px;
+    margin-bottom: 40px;
+}
+
+.profile-text {
+    /* font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif; */
+    /* font-family: "Lucida Console", Monaco, monospace; */
+    font-family: "Century Gothic";
+    font-size: 16px;
+    color: black;
+    padding-left: 20px;
+    padding-bottom: 5px;
+    margin: 8px;
+}
+
+.profile-text-entity {
+    padding-bottom: 7px;
+}
+
+.profile-value {
+    color: green;
+}
+
+.profile-none {
+    color: red;
+}

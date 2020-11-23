@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="text-center">
+    <div class="row">
+        <div class="col-sm-4"><h3 class="info-lead">From Your Library</h3></div>
+        <div class="col-sm-4"><h3 class="info-lead">From Your Top Tracks</h3></div>
+        <div class="col-sm-4"><h3 class="info-lead">From Your Top Artists</h3></div>
+    </div>
+
+    <form action="" method="post">
+        <div class="row row-buffer">
+            <div class="col-sm-4">
+                <button class="btn option-btn-library" type="submit" name="saved-library">Get From Your Saved Library</button>
+            </div>
+            <div class="col-sm-4">
+                <button class="btn option-btn" type="submit" name="long-top">Get From Long Term</button>
+            </div>
+            <div class="col-sm-4">
+                <button class="btn option-btn-artists" type="submit" name="long-artist" >Get From Long Term</button>
+            </div>
+        </div>
+
+        <div class="row row-buffer">
+            <div class="col-sm-4">
+                <button class="btn option-btn-library" type="submit" name="all-playlist">Get From Your Owned Playlists</button>
+            </div>
+            <div class="col-sm-4">
+                <button class="btn option-btn" type="submit" name="medium-top">Get From Medium Term</button>
+            </div>
+            <div class="col-sm-4">
+                <button class="btn option-btn-artists" type="submit" name="medium-artist">Get From Medium Term</button>
+            </div>
+        </div>
+
+        
+        <div class="row row-buffer">
+            <div class="col-sm-4">
+                <button class="btn option-btn-library" type="submit" name="combined">Get From Library + Owned Playlists</button>
+            </div>
+            <div class="col-sm-4">
+                <button class="btn option-btn" type="submit" name="short-top">Get From Short Term</button>
+            </div>
+            <div class="col-sm-4">
+                <button class="btn option-btn-artists" type="submit" name="short-artist">Get From Short Term</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="container text-center info-container">
+    <div class="jumbotron info-jumbotron">
+        <h2 class="info-lead">
+        {% if basis == 'saved-library' %}
+        Your Top Genres From Your Saved Library
+        {% elif basis == 'all-playlist' %}
+        Your Top Genres From Your Songs in Your Owned Playlists
+        {% elif basis == 'combined' %}
+        Your Top Genres From Your Library + Owned Playlists
+
+        {% elif basis == 'long-top' %}
+        Your Top Genres From Your Top Tracks of All Time
+        {% elif basis == 'medium-top' %}
+        Your Top Genres From Your Top Tracks in the Last Six Months
+        {% elif basis == 'short-top' %}
+        Your Top Genres From Your Top Tracks in the Last Month
+
+        {% elif basis == 'long-artist' %}
+        Your Top Genres From Your Top Artists of All Time
+        {% elif basis == 'medium-artist' %}
+        Your Top Genres From Your Top Artists in the Last Six Months
+        {% elif basis == 'short-artist' %}
+        Your Top Genres From Your Top Artists in the Last Month
+
+        {% else %}
+        Select an Option From Above
+        {% endif %}
+        </h2>
+
+        {% if counts %}
+            {% for count in counts %}
+                <h4><b class="info-lead">{{ loop.index }} &nbsp;&nbsp;</b> {{ count[0] }} - {{ count[1] }} 
+                {% if count[1] != 1 %} tracks {% else %} track {% endif %}</h4>
+            {% endfor %}
+        {% endif %}
+    
+    </div>
+</div>
+ {% endblock %}
+

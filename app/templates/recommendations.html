@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block content %}
+    <!-- <form method= "POST">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.genres.label }}<br>
+            {{ form.genres(size=32) }}
+        </p>
+        <p>
+            {{ form.artists.label }}<br>
+            {{ form.artists(size=32) }}
+        </p>
+        <p>
+            {{ form.tracks.label }}
+            {{ form.tracks(size=32) }}
+        </p>
+        <p>
+            {{ form.name.label }}
+            {{ form.name(size=32) }}
+        </p>
+        <p>
+            {{ form.amount.label }}
+            {{ form.amount(size=32) }}
+        </p>
+        <ul>
+            {% for error in form.amount.errors %}
+            <li style="color:red">{{ error }}</li>
+            {% endfor %}
+        </ul>
+        <button type="submit" name="normal">Generate Playlist</button>
+        <button type="submit" name="tabs">Generate Playlist with Available Tabs</button>
+    </form> -->
+
+    <form method="POST">
+        {{ form.csrf_token() }}
+        <div class="container text-center info-container"> 
+            <div class="jumbotron form-jumbotron">
+                <div class="row">
+                    <div class="col-md-4 col-centered">
+                        {{ wtf.form_field(form.genres) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-centered">
+                        {{ wtf.form_field(form.artists) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-centered">
+                        {{ wtf.form_field(form.tracks) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-centered">
+                        {{ wtf.form_field(form.name) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-centered">
+                        {{ wtf.form_field(form.amount) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-centered">
+                        {{ wtf.form_field(form.unique) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button class="btn option-btn" type="submit" name="normal">Generate Playlist</button>
+            <button class="btn option-btn" type="submit" name="tabs">Generate Playlist with Available Tabs</button>
+        </div>
+    </form>
+
+    {% if message %}
+    <div class="container text-center info-container">
+        <div class="jumbotron info-jumbotron">
+        <h3 class="info-lead"> {{ message }}</h3>
+        
+        {% if tabs %}
+            {% for name in tabs %}
+            <h5><b class="info-lead">{{ loop.index }} &nbsp;&nbsp;</b> {{ name }}  &nbsp;&nbsp;
+                <b class="info-lead">Tabs:</b> <a href="{{ tabs[name] }}" target="_blank"> {{ tabs[name] }}</a></h5>
+            {% endfor %}
+        {% endif %}  
+
+        </div>
+    </div>
+    {% endif %}
+
+ {% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block title %}
+    Mago
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-md navbar-dark fixed-top" style="background-color: #e3f2fd;">
+    <a class="navbar-brand" href="{{ url_for('index') }}">Mago</a>
+    <div class="container">
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="{{ url_for('top_tracks') }}">Top Tracks</a></li>
+                <li><a href="{{ url_for('top_genres') }}">Top Genres</a></li>
+                <li><a href="{{ url_for('top_artists') }}">Top Artists</a></li>
+                <li><a href="{{ url_for('create_playlists') }}">Organize</a></li>
+                <li><a href="{{ url_for('get_recommendations') }}">Recommendations</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><img alt="Profile" class="profile-nav-img" src="{{ user['image'] }}"></li>
+                <li><a href="{{ url_for('index') }}">{{ user['name'] }}</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="jumbotron" >
+    I LOVE HITAGI
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="/static/css/stylesheet.css">
+{% endblock %}

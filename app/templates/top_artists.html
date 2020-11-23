@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center">
+    <form action="" method="post">
+        <button class="btn option-btn" type="submit" name="saved-library">Get From Your Saved Library</button>
+        <button class="btn option-btn" type="submit" name="all-playlist">Get From Your Owned Playlists</button>
+        <button class="btn option-btn" type="submit" name="combined">Get From Library + Playlists</button>
+        <button class="btn option-btn" type="submit" name="long-term">Get Long Term Artists</button>
+        <button class="btn option-btn" type="submit" name="medium-term">Get Medium Term Artists</button>
+        <button class="btn option-btn" type="submit" name="short-term">Get Short Term Artists</button>
+    </form>
+</div>
+
+
+
+<div class="container text-center info-container">
+    <div class="jumbotron info-jumbotron">
+
+    <h2 class="info-lead">
+    {% if basis == 'saved-library' %}
+    Your Top Artists From Your Saved Library
+    {% elif basis == 'all-playlist' %}
+    Your Top Artists From Your Songs in Your Owned Playlists
+    {% elif basis == 'combined' %}
+    Your Top Artists From Your Library + Owned Playlists
+    {% elif basis == 'long-term' %}
+    Your Top Artists of All Time
+    {% elif basis == 'medium-term' %}
+    Your Top Artists in the last six months
+    {% elif basis == 'short-term' %}
+    Your Top Artists in the last month
+    {% else %}
+    Pick an Option From Above
+    {% endif %}
+    </h2>
+
+    {% if counts %}
+        {% for count in counts %}
+            {% if counted %}
+            <h4><b class="info-lead">{{ loop.index }} &nbsp;&nbsp;</b> {{ count[0] }} - {{ count[1] }} 
+            {% if count[1] != 1 %} tracks {% else %} track {% endif %}</h4>
+            {% else %}
+            <h4><b class="info-lead">{{ loop.index }} &nbsp;&nbsp;</b> {{ count }}</h4>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    </div>
+</div>
+    
+{% endblock %}

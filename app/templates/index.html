@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container info-container">
+    <div class="jumbotron fluid-jumbotron focus-jumbotron">
+        
+        <div class="row">
+            <div class="col-sm-4">
+                <h2 class="info-lead profile-name">Hello {{ user['name'] }}, </h2>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-3">
+                <img class="profile-img" src="{{ user['image']  }}">
+            </div>
+
+            <div class="col-sm-8 profile-text">
+
+                <div class="row profile-text-entity">
+                    Total Number of Tracks in Your Library: &nbsp;&nbsp;
+                    {% if parses['saved-library-tracks'] %}
+                    <span class="profile-value pull-right">{{ parses['saved-library-tracks'] }}</span>
+                    {% else %}
+                    <span class="profile-none">NOT PARSED</span>
+                    <button class="btn option-btn-library pull-right" type="submit" name="saved-library">Parse</button>
+                    {% endif %}
+                </div>
+
+                <div class="row profile-text-entity">
+                    Total Number of Tracks in Your Owned Playlists: 
+                    {% if parses['all-playlist-tracks'] %}
+                    <span class="profile-value pull-right">{{ parses['all-playlist-tracks'] }}</span>
+                    {% else %}
+                    <span class="profile-none">NOT PARSED</span>
+                    <button class="btn option-btn-library pull-right" type="submit" name="all-playlist-tracks">Parse</button>
+                    {% endif %}
+                </div>
+
+                <div class="row profile-text-entity">
+                    Total Number of Unique Tracks in your library + playlists:
+                    {% if parses['combined-tracks'] %}
+                    <span class="profile-value pull-right">{{ parses['combined-tracks'] }}</span>
+                    {% else %}
+                    <span class="profile-none">NOT PARSED</span>
+                    <button class="btn option-btn-library pull-right" type="submit" name="combined-tracks">Parse</button>
+                    {% endif %}
+                </div>
+
+                <div class="row profile-text-entity">
+                    Total Number of Unique Artists:
+                    {% if parses['combined-artists'] %}
+                    <span class="profile-value pull-right">{{ parses['combined-artists'] }}</span>
+                    {% else %}
+                    <span class="profile-none">NOT PARSED</span>
+                    <button class="btn option-btn-library pull-right" type="submit" name="combined-artists">Parse</button>
+                    {% endif %}
+                </div>
+                <br>
+
+                <div class="row profile-text-entity">
+                    Top Tracks from your Last Month: 
+                    {% if parses['short-top-tracks'] %}
+                    <div class="profile-value">{{ parses['short-top-tracks'] }}</div>
+                    {% else %}
+                    <span class="profile-none">NOT PARSED</span>
+                    <button class="btn option-btn pull-right" type="submit" name="short-top-tracks">Parse</button>
+                    {% endif %}
+                </div>
+
+                <div class="row profile-text-entity">
+                    Top Tracks from your Last Six Months 
+                    {% if parses['medium-top-tracks'] %}
+                    <div class="profile-value">{{ parses['medium-top-tracks'] }}</div>
+                    {% else %}
+                    <span class="profile-none">NOT PARSED</span>
+                    <button class="btn option-btn pull-right" type="submit" name="medium-top-tracks">Parse</button>
+                    {% endif %}
+                </div>
+
+                <div class="row profile-text-entity">
+                    Top Tracks of All Time: 
+                    {% if parses['long-top-tracks'] %}
+                    <div class="profile-value">{{ parses['long-top-tracks'] }}</div>
+                    {% else %}
+                    <span class="profile-none">NOT PARSED</span>
+                    <button class="btn option-btn pull-right" type="submit" name="long-top-tracks">Parse</button>
+                    {% endif %}
+                </div>
+                <br>
+
+                <div class="row profile-text-entity">
+                    Top Artists from your Last Month: 
+                    {% if parses['short-top-artists'] %}
+                    <div class="profile-value">{{ parses['short-top-artists'] }}</div>
+                    {% else %}
+                    <span class="profile-none">NOT PARSED</span>
+                    <button class="btn option-btn-artists pull-right" type="submit" name="short-top-artists">Parse</button>
+                    {% endif %}
+                </div>
+           
+                <div class="row profile-text-entity">
+                    Top Artists from your Last Six Months: 
+                    {% if parses['medium-top-artists'] %}
+                    <div class="profile-value">{{ parses['medium-top-artists'] }}</div>
+                    {% else %}
+                    <span class="profile-none">NOT PARSED</span>
+                    <button class="btn option-btn-artists pull-right" type="submit" name="medium-top-artists">Parse</button>
+                    {% endif %}
+                </div>
+               
+                <div class="row profile-text-entity">
+                    Top Artists of All Time: 
+                    {% if parses['long-top-artists'] %}
+                    <div class="profile-value">{{ parses['long-top-artists'] }}</div>
+                    {% else %}
+                    <span class="profile-none">NOT PARSED</span>
+                    <button class="btn option-btn-artists pull-right" type="submit" name="long-top-artists">Parse</button>
+                    {% endif %}
+                </div>
+                <br>
+
+                <div class="row profile-text-entity">
+                    Top Genres from Your Last Month: 
+                    {% if parses['short-genres'] %}
+                    <div class="profile-value">{{ parses['short-genres'] }}</div>
+                    {% else %}
+                    <span class="profile-none">NOT PARSED</span>
+                    <button class="btn option-btn-genres pull-right" type="submit" name="short-genres">Parse</button>
+                    {% endif %}
+                </div>
+                
+                <div class="row profile-text-entity">
+                    Top Genres from Your Last Six Months: 
+                    {% if parses['medium-genres'] %}
+                    <div class="profile-value">{{ parses['medium-genres'] }}</div>
+                    {% else %}
+                    <span class="profile-none">NOT PARSED</span>
+                    <button class="btn option-btn-genres pull-right" type="submit" name="medium-genres">Parse</button>
+                    {% endif %}
+                </div>
+                
+                <div class="row profile-text-entity">
+                    Top Genres of All Time: 
+                    {% if parses['long-genres'] %}
+                    <div class="profile-value">{{ parses['long-genres'] }}</div>
+                    {% else %}
+                    <span class="profile-none">NOT PARSED</span>
+                    <button class="btn option-btn-genres pull-right" type="submit" name="long-genres">Parse</button>
+                    {% endif %}
+                </div>
+         
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
