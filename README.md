@@ -22,3 +22,5 @@ Dependencies:
 - flask-session
 - spotipy
 
+You also need a working spotify client id, client secret and redirect uri which you can get from the spotify dev website.
+Place them inside app/client.py
