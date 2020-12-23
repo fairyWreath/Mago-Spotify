@@ -322,58 +322,10 @@ def create_playlists():
         print('aaaa')
         print(data)
         if len(uris) == 0:
-            print('keyword not found')
+            message "No tracks of the given artist/genre found"
         else:
             mei.createPlaylistFromUris(uris, sp, playlist_name)
-
-    # if request.method == 'POST' and 'track-artist' in request.form:
-    #     if session.get('saved-library-tracks') is None:
-    #         parse.parseSavedLibraryTracks(sp)
-    #     if session.get('library-artists-track-artist-dict') is None:
-    #         parse.parseLibraryTrackArtistDict()
-    #     track_artist_dict = session['library-artists-track-artist-dict']
-    #     artist = form.input.data
-    #     print(form.input.data)
-    #     playlist_name = form.name.data
-    #     print(form.name.data)
-    #     uris = mei.getUrisFromSaved(track_artist_dict, artist)
-    #     mei.createPlaylistFromUris(uris, sp, playlist_name)
-
-    # if request.method == 'POST' and 'track-genre' in request.form:
-    #     if session.get('saved-library-tracks') is None:
-    #         parse.parseSavedLibraryTracks(sp)
-    #     if session.get('saved-library-track-genre-dict') is None:
-    #         parse.parseLibraryGenreDict()
-    #     track_genre_dict = session['saved-library-track-genre-dict']
-    #     genre = form.input.data
-    #     playlist_name = form.name.data
-    #     uris = mei.getUrisFromSaved(track_genre_dict, genre)
-    #     mei.createPlaylistFromUris(uris, sp, playlist_name)
-
-    # if request.method == 'POST' and 'combined-track-artist' in request.form:
-    #     if session.get('combined-library-playlist-tracks') is None:
-    #         token = auth_manager.get_access_token(as_dict=False)
-    #         parse.parseCombinedTracks(sp, token)
-    #     if session.get('combined-track-artist-dict') is None:
-    #         token = auth_manager.get_access_token(as_dict=False)
-    #         parse.parseCombinedTrackArtistDict()
-    #     track_artist_dict = session['combined-track-artist-dict']
-    #     artist = form.input.data
-    #     playlist_name = form.name.data
-    #     uris = mei.getUrisFromSaved(track_artist_dict, artist)
-    #     mei.createPlaylistFromUris(uris, sp, playlist_name)
-
-    # if request.method == 'POST' and 'combined-track-genre' in request.form:
-    #     if session.get('combined-library-playlist-tracks') is None:
-    #         token = auth_manager.get_access_token(as_dict=False)
-    #         parse.parseCombinedTracks(sp, token)
-    #     if session.get('combined-track-genre-dict') is None:
-    #         parse.parseCombinedTrackGenreDict(sp)
-    #     track_genre_dict = session['combined-track-genre-dict']
-    #     genre = form.input.data
-    #     playlist_name = form.name.data
-    #     uris = mei.getUrisFromSaved(track_genre_dict, genre)
-    #     mei.createPlaylistFromUris(uris, sp, playlist_name)
+            message = "Playlist {} succesfully created".format(playlist_name)
 
     return render_template('create_playlist.html', form=form, user=session['user'])
 
@@ -391,7 +343,6 @@ def get_recommendations():
         all_tracks = []
         if session.get('combined-library-playlist-tracks') is not None:     # get all track list data if they are available
             all_tracks = session['combined-library-playlist-tracks']
-        all_tracks = []
         artist_names = form.artists.data.split(",")
         genre_names = form.genres.data.split(",")
         track_names = form.tracks.data.split(",")
@@ -414,7 +365,7 @@ def get_recommendations():
             mei.createPlaylistFromUris(uris, sp, playlist_name)
             message = "Playlist '{}' successfully created".format(playlist_name)
         else:
-            message = "Recommendations could not be generated: Some artists/tracks may be incompatible"
+            message = "Recommendations could not be generated: Some artists/tracks may be incompatible, or seed limit exceeded"
 
     return render_template('recommendations.html', form=form, message=message, tabs=tabs, user=session['user'])
 

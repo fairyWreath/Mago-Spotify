@@ -3,28 +3,36 @@
 
 {% block content %}
     <form action="" method="POST">
-        
-        <div class="container text-center info-container"> 
+        {{ form.csrf_token() }}
+        <div class="container info-container"> 
             <div class="jumbotron form-jumbotron">
+                <h2 class="info-lead section-header">Organize Your Playlist</h2>
+                <h3 class="normal-text">Create a unique playlist of a single track or genre, based on all the tracks
+                    on your saved library and your playlists
+                </h3>
+
+
                 <div class="row">
-                    <div class="col-md-4 col-centered">
+                    <div class="col-md-4 form-entry">
                         {{ wtf.form_field(form.input) }}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4 col-centered">
+                    <div class="col-md-4 form-entry">
                         {{ wtf.form_field(form.name) }}
                     </div>
                 </div>
+
+                <div class="text-center">
+                    <button class="btn option-btn" type="submit" name="track-artist">Create Playlist of An Artist</button>
+                    <button class="btn option-btn" type="submit" name="track-genre">Create Playlist of A Genre</button>
+                    <button class="btn option-btn" type="submit" name="combined-track-artist">Create Artist Including Playlists</button>
+                    <button class="btn option-btn" type="submit" name="combined-track-genre">Create Genre Including Playlists</button>
+                </div>
+
             </div>
         </div>
 
-        <div class="text-center">
-            <button class="btn option-btn" type="submit" name="track-artist">Create Playlist of An Artist</button>
-            <button class="btn option-btn" type="submit" name="track-genre">Create Playlist of A Genre</button>
-            <button class="btn option-btn" type="submit" name="combined-track-artist">Create Playlist of An Artist From Combined</button>
-            <button class="btn option-btn" type="submit" name="combined-track-genre">Create Playlist of   AAAAA From Combined</button>
-        </div>
     </form>
 
 {% endblock %}

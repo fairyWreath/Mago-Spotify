@@ -51,10 +51,12 @@ def getTrackGenreFromAlbum(track, sp):
  
 def getTrackGenreFromArtist(track, sp):
     genres = set()
-    print(track['name'], end=" -> ")
-    print(track['artists'][0]['name'])
     artists = track['artists']
     for artist in artists:
+        # for user defined local files, skip them as they have no artist id
+        if artist['id'] is None:
+            continue
+
         artist_id = artist['id']
         artist_object = sp.artist(artist_id)
         artist_genres = artist_object['genres']
@@ -65,7 +67,6 @@ def getTrackGenreFromArtist(track, sp):
 def getTrackGenre(track, sp):
     genres = getTrackGenreFromAlbum(track, sp)
     if not genres:
-        print('yes')
         genres = getTrackGenreFromArtist(track, sp)
     return genres
 
@@ -109,7 +110,6 @@ def getUserSavedTracksList(sp):
         if track_items:
             for item in track_items:
                 track = item['track']
-                print(track['name'])
                 all_tracks.append(track)
             offset += 50
         else:
@@ -194,8 +194,6 @@ def getTrackGenreDict(tracks, sp):
     for track in tracks:
         genres = getTrackGenreFromArtist(track, sp)
         result[track['uri']] = genres
-        print(track['name'], end="  ")
-        print(genres)
         all_genres.extend(genres)
     return result, all_genres
 
@@ -235,9 +233,6 @@ def getTrackArtistDict(tracks):
 ''' extract all data from playlists '''
 # ''' only your owned playlists
 def getTracksFromAllPlaylists(sp, token):
-
-    print("GET ALL TRACKS FROM ALL PLAYLISTS")
-
     max_limit = 50          # limit for both getting the playlists and getting the tracks in a playlist
     playlist_offset = 0
     playlists = []
@@ -246,7 +241,6 @@ def getTracksFromAllPlaylists(sp, token):
     while all_reached is False:
         plays = sp.current_user_playlists(limit=max_limit, offset=playlist_offset)
         items = plays['items']
-        print(len(items))
         playlists.extend(items)
         if len(items) < max_limit:      #less than 50 means all playlists has been grabbed
             all_reached = True
@@ -280,7 +274,6 @@ def getTracksFromAllPlaylists(sp, token):
                 items = content['items']
                 for item in items:
                     if item['track']['id'] not in all_tracks_dict:
-                        print(item['track']['name'])
                         all_tracks_dict[item['track']['id']] = item['track']
 
                 if len(items) < max_limit:

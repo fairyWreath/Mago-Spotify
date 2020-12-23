@@ -46,16 +46,29 @@
     background-color:  #e472bf;
 }
 
+.login-jumbotron {
+    padding-top: 5px;
+    padding-bottom: 25px;
+    padding-left: 5px;
+    padding-right: 5px;
+    background-color:  #e472bf;
+}
+
+.login-btn {
+    margin-top:20px;
+    background-color: #64d4c7; 
+    color: black;
+    font-size: 20px;
+}
+
 .form-jumbotron {
     margin-left: 10px;
     margin-right: 10px; 
     padding-top: 5px;
-    padding-bottom: 5px;
-    padding-left: 200px;
-    padding-right: 200px;
+    padding-bottom: 30px;
     width: 1000px;
     margin: 0 auto;
-    margin: 0 auto;
+    background-color:  #e472bf;
 }
 
 .row-buffer { 
@@ -87,10 +100,24 @@
 }
 
 .profile-name {
+    font-family: 'Overlock', cursive;
+    color: #64d4c7;
+    padding-left: 0px;
+    font-size: 36px;
+}
+
+
+.title-page {
     font-family: 'Tangerine', cursive;
     color: #64d4c7;
     padding-left: 0px;
-    font-size: 48px;
+    font-size: 70px;
+}
+
+.title-page-text{
+    font-family: 'Overlock', cursive;
+    color: white;
+    font-size: 22px;
 }
 
 .profile-img {
@@ -118,7 +145,20 @@
 .normal-text{
     font-family: 'Overlock', cursive;
     color: white;
-   
+}
+
+.form-entry{
+    font-family: 'Overlock', cursive;
+    color: black;
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.section-header{
+    font-family: 'Overlock', cursive;
+    color: black;
+    padding-left: 0px;
+    font-size: 42px;
 }
 
 .title-text {

@@ -2,94 +2,76 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block content %}
-    <!-- <form method= "POST">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.genres.label }}<br>
-            {{ form.genres(size=32) }}
-        </p>
-        <p>
-            {{ form.artists.label }}<br>
-            {{ form.artists(size=32) }}
-        </p>
-        <p>
-            {{ form.tracks.label }}
-            {{ form.tracks(size=32) }}
-        </p>
-        <p>
-            {{ form.name.label }}
-            {{ form.name(size=32) }}
-        </p>
-        <p>
-            {{ form.amount.label }}
-            {{ form.amount(size=32) }}
-        </p>
-        <ul>
-            {% for error in form.amount.errors %}
-            <li style="color:red">{{ error }}</li>
-            {% endfor %}
-        </ul>
-        <button type="submit" name="normal">Generate Playlist</button>
-        <button type="submit" name="tabs">Generate Playlist with Available Tabs</button>
-    </form> -->
 
     <form method="POST">
+
         {{ form.csrf_token() }}
-        <div class="container text-center info-container form-container"> 
+        <div class="container info-container"> 
             <div class="jumbotron form-jumbotron">
+                <h2 class="info-lead section-header">Create Your Own <i>Discover Weekly</i> Playlist</h2>
+                <h3 class="normal-text">
+                    Get recommendations based on tracks, genres and artists <br>
+                    - Maximum of five entries per track, genre and artist<br>
+                    - Separate each entry with a comma <br>
+                    - select unique to only receive tracks that are not already in your library and playlists<br>
+                    - select to create with tabs to only get songs that have their tabs posted on 
+                    <a href="https://www.songsterr.com/" target="_blank">songsterr.com</a>
+                </h3>
+
                 <div class="row">
-                    <div class="col-md-4 col-centered">
+                    <div class="col-md-4 form-entry ">
                         {{ wtf.form_field(form.genres) }}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4 col-centered">
+                    <div class="col-md-4  form-entry">
                         {{ wtf.form_field(form.artists) }}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4 col-centered">
+                    <div class="col-md-4  form-entry">
                         {{ wtf.form_field(form.tracks) }}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4 col-centered">
+                    <div class="col-md-4  form-entry">
                         {{ wtf.form_field(form.name) }}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4 col-centered">
+                    <div class="col-md-4  form-entry">
                         {{ wtf.form_field(form.amount) }}
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4 col-centered">
+                    <div class="col-md-4  form-entry">
                         {{ wtf.form_field(form.unique) }}
                     </div>
                 </div>
+         
+
+                <div class="text-center">
+                    <button class="btn option-btn" type="submit" name="normal">Generate Playlist</button>
+                    <button class="btn option-btn" type="submit" name="tabs">Generate Playlist with Available Tabs</button>
+                </div>
+
             </div>
         </div>
 
-        <div class="text-center">
-            <button class="btn option-btn" type="submit" name="normal">Generate Playlist</button>
-            <button class="btn option-btn" type="submit" name="tabs">Generate Playlist with Available Tabs</button>
+        {% if message %}
+        <div class="container text-center info-container normal-text">
+            <div class="jumbotron info-jumbotron">
+            <h3 class="info-lead"> {{ message }}</h3>
+            
+            {% if tabs %}
+                {% for name in tabs %}
+                <h4><b class="info-lead">{{ loop.index }} &nbsp;&nbsp;</b> {{ name }}  &nbsp;&nbsp;
+                    <b class="info-lead">Tabs:</b> <a href="{{ tabs[name] }}" target="_blank"> {{ tabs[name] }}</a></h4>
+                {% endfor %}
+            {% endif %}  
+    
+            </div>
         </div>
-    </form>
-
-    {% if message %}
-    <div class="container text-center info-container">
-        <div class="jumbotron info-jumbotron">
-        <h3 class="info-lead"> {{ message }}</h3>
-        
-        {% if tabs %}
-            {% for name in tabs %}
-            <h5><b class="info-lead">{{ loop.index }} &nbsp;&nbsp;</b> {{ name }}  &nbsp;&nbsp;
-                <b class="info-lead">Tabs:</b> <a href="{{ tabs[name] }}" target="_blank"> {{ tabs[name] }}</a></h5>
-            {% endfor %}
-        {% endif %}  
-
-        </div>
-    </div>
-    {% endif %}
+        {% endif %}
 
  {% endblock %}

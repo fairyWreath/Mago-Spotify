@@ -11,9 +11,19 @@
 {% endblock %}
 
 {% block content %}
-<div class="text-center">
-    <a class="btn" href="{{ login_url }}" style="background-color: #f2c40d; color: black;">Sign in</a>
+<div class="container text-center info-container">
+    <div class="jumbotron login-jumbotron normal-text">
+        <h2 class="title-page">
+            Mago
+        </h2>
+        <h3 class="title-page-text">
+           Uncover your listening habits, organize your library and discover new music<br>
+        </h3>
+
+        <a class="btn login-btn normal-text" href="{{ login_url }}">Sign in with Spotify</a>
+    </div>
 </div>
+
 {% endblock %}
 
 {% block styles %}
