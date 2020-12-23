@@ -274,7 +274,7 @@ def create_playlists():
     sp = spotipy.Spotify(auth_manager=auth_manager)
     form = SingleInputPlaylistForm()
     message = None
-
+  
     if request.method == 'POST':
         data_dict = dict()
         if 'track-artist' in request.form  or 'track-genre' in request.form:
