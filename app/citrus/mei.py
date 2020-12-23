@@ -95,11 +95,9 @@ def searchTrackUrisFromList(track_names, all_tracks):
     not_found_tracks = []
 
     for track_name in track_names:
-        print('search track')
         found = False
         for track in all_tracks:
             if track_name == track['name']:
-                print(track['name'])
                 track_uris.append(track['id'])
                 found = True
                 break
@@ -175,12 +173,8 @@ def getRecommendationUris(artist_names, genre_names, track_names, all_tracks, am
             rec_tracks = recs['tracks']
             for track in rec_tracks:
                 track_uri = track['uri']
-                print(track['name'],end="->")
-                print(track['artists'][0]['name'])
-
                 if tab_state is True:
                     track_tablink = songsterr.searchForTabLink(track['artists'][0]['name'], track['name'])
-                    print(track_tablink)
                     if track_tablink != False:
                         output_name = track['name'] + " - " + track['artists'][0]['name']
                         tabs[output_name] = track_tablink
@@ -201,8 +195,6 @@ def getRecommendationUris(artist_names, genre_names, track_names, all_tracks, am
         if cycles >= cycles_limit:
             return False
             break
-
-        print(len(result_uris))
 
     if not tab_state:
         return result_uris

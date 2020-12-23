@@ -9,8 +9,6 @@ from app import app, caches_folder
 from app.client import client_id, client_secret, redirect_uri, scope
      
 def session_cache_path():
-    print(session.get('uuid'))
-    print(caches_folder)
     return caches_folder + session.get('uuid')
 
 @app.route('/')
@@ -279,55 +277,40 @@ def create_playlists():
 
     if request.method == 'POST':
         data_dict = dict()
-
         if 'track-artist' in request.form  or 'track-genre' in request.form:
-            print('nn')
             if session.get('saved-library-tracks') is None:
                 parse.parseSavedLibraryTracks(sp)
             if 'track-artist' in request.form:
                 if session.get('library-artists-track-artist-dict') is None:
                     parse.parseLibraryTrackArtistDict()
-                print('track-artist')
                 data_dict = session['library-artists-track-artist-dict']
             elif 'track-genre' in request.form:
                 if session.get('saved-library-track-genre-dict') is None:
                     parse.parseLibraryTrackGenreDict(sp)
-                print('track-genre')
                 data_dict = session['saved-library-track-genre-dict']
         elif 'combined-track-artist' in request.form or 'combined-track-genre' in request.form:
-            print('ZZZz')
             if session.get('combined-library-playlist-tracks') is None:
                 token = auth_manager.get_access_token(as_dict=False)
-                print('parse combined')
                 parse.parseCombinedTracks(sp, token)
-            print('ZZZz')
-            print(len(session['combined-library-playlist-tracks']))
             if 'combined-track-artist' in request.form:
                 if session.get('combined-track-artist-dict') is None:
                     parse.parseCombinedTrackArtistDict()
-                print('artist combined')
                 data_dict = session['combined-track-artist-dict']
             elif 'combined-track-genre' in request.form:
                 if session.get('combined-track-genre-dict') is None:
                     parse.parseCombinedTrackGenreDict(sp)
-                print('genre combined') 
                 data_dict = session['combined-track-genre-dict'] 
 
         data = form.input.data      # artist or genre name
         playlist_name = form.name.data
-        print(len(data_dict))
-        # print(data_dict)
         uris = mei.getUrisFromSaved(data_dict, data)
-        print(len(uris))
-        print('aaaa')
-        print(data)
         if len(uris) == 0:
-            message "No tracks of the given artist/genre found"
+            message = "No tracks of the given artist/genre found"
         else:
             mei.createPlaylistFromUris(uris, sp, playlist_name)
             message = "Playlist {} succesfully created".format(playlist_name)
 
-    return render_template('create_playlist.html', form=form, user=session['user'])
+    return render_template('create_playlist.html', form=form, user=session['user'], message=message)
 
 @app.route('/user/recommendations', methods=['GET', 'POST'])
 def get_recommendations():

@@ -35,4 +35,13 @@
 
     </form>
 
+    {% if message %}
+    <div class="container text-center info-container normal-text">
+        <div class="jumbotron info-jumbotron">
+        <h3 class="info-lead"> {{ message }}</h3>
+
+        </div>
+    </div>
+    {% endif %}
+
 {% endblock %}
