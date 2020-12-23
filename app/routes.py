@@ -342,14 +342,16 @@ def get_recommendations():
     tabs = None
 
     if request.method == 'POST' and form.validate() and 'normal' in request.form:
-        if session.get('combined-library-playlist-tracks') is None:
-            token = auth_manager.get_access_token(as_dict=False)
-            parse.parseCombinedTracks(sp, token)
-        all_tracks = session['combined-library-playlist-tracks']
+        # if session.get('combined-library-playlist-tracks') is None:
+        #     token = auth_manager.get_access_token(as_dict=False)
+        #     parse.parseCombinedTracks(sp, token)
+        # all_tracks = session['combined-library-playlist-tracks']
+        all_tracks = []
         artist_names = form.artists.data.split(",")
         genre_names = form.genres.data.split(",")
         track_names = form.tracks.data.split(",")
         print(artist_names)
+        print(track_names)
         playlist_name = form.name.data
         amount = form.amount.data
         uris = None
@@ -369,10 +371,11 @@ def get_recommendations():
         
 
     if request.method == 'POST' and form.validate() and 'tabs' in request.form:
-        if session.get('combined-library-playlist-tracks') is None:
-            token = auth_manager.get_access_token(as_dict=False)
-            parse.parseCombinedTracks(sp, token)
-        all_tracks = session['combined-library-playlist-tracks']
+        # if session.get('combined-library-playlist-tracks') is None:
+        #     token = auth_manager.get_access_token(as_dict=False)
+        #     parse.parseCombinedTracks(sp, token)
+        # all_tracks = session['combined-library-playlist-tracks']
+        all_tracks = []
         artist_names = form.artists.data.split(",")
         genre_names = form.genres.data.split(",")
         track_names = form.tracks.data.split(",")
@@ -380,9 +383,9 @@ def get_recommendations():
         amount = form.amount.data
         uris = None
         if form.unique.data is True:
-            uris, tabs = mei.getUniqueTabTrackRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp)
+            uris, tabs = mei.getRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp, True, True)
         else:
-            uris, tabs = mei.getTabTrackRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp)
+            uris, tabs = mei.getRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp, tab_state=True)
         if uris is not False:
             uris = list(uris)
             print(len(uris))

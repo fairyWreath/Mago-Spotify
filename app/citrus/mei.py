@@ -68,35 +68,35 @@ def getAvailableGenresOnly(genres):
 def replace_runs_of_whitespace(words):
     return words.replace(' ','+') 
 
-def getUniqueTrackRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp):
-
+''' search artist uris from a given track list '''
+def searchArtistUrisFromList(artist_names, all_tracks):
     artist_uris = []
-    track_uris = []
-
     not_found_artists = []
-    not_found_tracks = []
-    ''' first check through saved/top tracks before accessing sp.search '''
 
-    ''' loop through artist names '''
     for artist_name in artist_names:
+        found = False
         for track in all_tracks:
-            artists = track['artists']
-            found = False
-            for artist in artists:
+            for artist in track['artists']:
                 if artist_name == artist['name']:
-                    artist_uris.append(artist['uri'])
-                    print(artist['name'])
-                    found = True
-                    break
+                     artist_uris.append(artist['uri'])
+                     found = True
+                     break
             if found is True:
                 break
         if found is False:
             not_found_artists.append(artist_name)
     
-    ''' loop through track names '''
+    return artist_uris, not_found_artists
+
+''' search track uris from a given track list '''
+def searchTrackUrisFromList(track_names, all_tracks):
+    track_uris = []
+    not_found_tracks = []
+
     for track_name in track_names:
+        print('search track')
+        found = False
         for track in all_tracks:
-            found = False
             if track_name == track['name']:
                 print(track['name'])
                 track_uris.append(track['id'])
@@ -104,12 +104,152 @@ def getUniqueTrackRecommendationUris(artist_names, genre_names, track_names, all
                 break
         if found is False:
             not_found_tracks.append(track_name)
-    
-    for artist_name in not_found_artists:
+
+    return track_uris, not_found_tracks
+
+''' search for artists using the api'''
+def searchArtistUris(artist_names, sp):
+    artist_uris = []
+    for artist_name in artist_names:
         name = replace_runs_of_whitespace(artist_name)
+        if name == '':              # handle .split ''
+            continue
         searches = sp.search(q=name, type="artist")
         if len(searches['artists']['items']) > 0:
             artist_uris.append(searches['artists']['items'][0]['uri'])
+    return artist_uris
+
+''' search for tracks using the api '''
+def searchTrackUris(track_names, sp):
+    track_uris = []
+    for track_name in track_names:
+        name = replace_runs_of_whitespace(track_name)
+        if name == '':              # handle .split ''
+            continue
+        searches = sp.search(q=name, type="track")
+        if len(searches['tracks']['items']) > 0:
+            track_uris.append(searches['tracks']['items'][0]['uri'])
+    return track_uris
+
+''' not unique '''
+def getTrackRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp):
+    artist_uris = []
+    track_uris = []
+    not_found_artists = []
+    not_found_tracks = []
+
+    artist_uris, not_found_artists = searchArtistUrisFromList(artist_names, all_tracks)
+    track_uris, not_found_tracks = searchTrackUrisFromList(track_names, all_tracks)
+
+    if len(not_found_artists) > 0:
+        artist_uris = artist_uris + searchArtistUris(artist_names, sp)
+    
+    if len(not_found_tracks) > 0:
+        tracks_uris = track_uris + searchTrackUris(track_names, sp)
+
+    av_genres = getAvailableGenresOnly(genre_names)
+    result_uris = set()
+    max_limit = 100
+    remaining = amount
+    recommend = True 
+    
+    while(recommend):
+        limit = max_limit
+        try:
+            recs = sp.recommendations(seed_tracks=track_uris, seed_genres=av_genres ,seed_artists=artist_uris, limit=limit)
+        except:
+            return False
+            break
+        else:
+            rec_tracks = recs['tracks']
+            for track in rec_tracks:
+                track_uri = track['uri']
+                print(track['name'],end="->")
+                print(track['artists'][0]['name'])
+                result_uris.add(track_uri)
+                if len(result_uris) >= amount:
+                    recommend = False
+                    break
+
+    return result_uris
+
+
+def getTabTrackRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp):
+    artist_uris = []
+    track_uris = []
+    not_found_artists = []
+    not_found_tracks = []
+
+    artist_uris, not_found_artists = searchArtistUrisFromList(artist_names, all_tracks)
+    track_uris, not_found_tracks = searchTrackUrisFromList(track_names, all_tracks)
+
+    if len(not_found_artists) > 0:
+        artist_uris = artist_uris + searchArtistUris(artist_names, sp)
+    
+    if len(not_found_tracks) > 0:
+        tracks_uris = track_uris + searchTrackUris(track_names, sp)
+    
+    av_genres = getAvailableGenresOnly(genre_names)
+    result_uris = set()
+    tabs = {}
+
+    max_limit = 100
+    remaining = amount
+    recommend = True 
+    
+    while(recommend):
+        limit = max_limit
+        
+        try:
+            recs = sp.recommendations(seed_tracks=track_uris, seed_genres=av_genres ,seed_artists=artist_uris, limit=limit)
+        except:
+            return False, False
+            break
+        else:
+            rec_tracks = recs['tracks']
+            for track in rec_tracks:
+                track_uri = track['uri']
+                print(track['name'],end="->")
+                print(track['artists'][0]['name'])
+
+                track_tablink = songsterr.searchForTabLink(track['artists'][0]['name'], track['name'])
+                print(track_tablink)
+                if track_tablink != False:
+                    output_name = track['name'] + " - " + track['artists'][0]['name']
+                    tabs[output_name] = track_tablink
+                    
+                    print(track_tablink)
+                    result_uris.add(track_uri)
+
+                if len(result_uris) >= amount:
+                    recommend = False
+                    break
+    
+        print(len(result_uris)) 
+                
+    return list(result_uris), tabs
+
+
+def checkUniqueFromList(track_uri, all_tracks):
+    for track_item in all_tracks:
+        if track_uri == track_item['uri']:
+            return False
+    return True
+
+def getUniqueTrackRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp):
+    artist_uris = []
+    track_uris = []
+    not_found_artists = []
+    not_found_tracks = []
+
+    artist_uris, not_found_artists = searchArtistUrisFromList(artist_names, all_tracks)
+    track_uris, not_found_tracks = searchTrackUrisFromList(track_names, all_tracks)
+
+    if len(not_found_artists) > 0:
+        artist_uris = artist_uris + searchArtistUris(artist_names, sp)
+    
+    if len(not_found_tracks) > 0:
+        tracks_uris = track_uris + searchTrackUris(track_names, sp)
 
     av_genres = getAvailableGenresOnly(genre_names)
     result_uris = set()
@@ -158,53 +298,19 @@ def getUniqueTrackRecommendationUris(artist_names, genre_names, track_names, all
 
 ''' also unique '''
 def getUniqueTabTrackRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp):
-
     artist_uris = []
     track_uris = []
-
     not_found_artists = []
     not_found_tracks = []
-    ''' first check through saved/top tracks before accessing sp.search '''
 
-    ''' loop through artist names '''
-    for artist_name in artist_names:
-        for track in all_tracks:
-            artists = track['artists']
-            found = False
-            for artist in artists:
-                if artist_name == artist['name']:
-                    artist_uris.append(artist['uri'])
-                    print(artist['name'])
-                    found = True
-                    break
-            if found is True:
-                break
-        if found is False:
-            not_found_artists.append(artist_name)
-    
-    ''' loop through track names '''
-    for track_name in track_names:
-        for track in all_tracks:
-            found = False
-            if track_name == track['name']:
-                print(track['name'])
-                track_uris.append(track['id'])
-                found = True
-                break
-        if found is False:
-            not_found_tracks.append(track_name)
-    
-    for artist_name in not_found_artists:
-        name = replace_runs_of_whitespace(artist_name)
-        searches = sp.search(q=name, type="artist")
-        if len(searches['artists']['items']) > 0:
-            artist_uris.append(searches['artists']['items'][0]['uri'])
+    artist_uris, not_found_artists = searchArtistUrisFromList(artist_names, all_tracks)
+    track_uris, not_found_tracks = searchTrackUrisFromList(track_names, all_tracks)
 
-    # for track_name in not_found_tracks:
-    #     name = replace_runs_of_whitespace(track_name)
-    #     searches = sp.search(q=name, type="track")
-    #     if len(searches['tracks']['items']) > 0:
-    #         track_uris.append(searches['tracks']['items'][0]['uri'])
+    if len(not_found_artists) > 0:
+        artist_uris = artist_uris + searchArtistUris(artist_names, sp)
+    
+    if len(not_found_tracks) > 0:
+        tracks_uris = track_uris + searchTrackUris(track_names, sp)
 
     
     av_genres = getAvailableGenresOnly(genre_names)
@@ -261,56 +367,36 @@ def getUniqueTabTrackRecommendationUris(artist_names, genre_names, track_names, 
     return list(result_uris), tabs
 
 
-''' not unique '''
-def getTrackRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp):
+def getRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp, unique_state=False, tab_state=False):
     artist_uris = []
     track_uris = []
     not_found_artists = []
     not_found_tracks = []
 
-    for artist_name in artist_names:
-        for track in all_tracks:
-            artists = track['artists']
-            found = False
-            for artist in artists:
-                if artist_name == artist['name']:
-                    artist_uris.append(artist['uri'])
-                    print(artist['name'])
-                    found = True
-                    break
-            if found is True:
-                break
-        if found is False:
-            not_found_artists.append(artist_name)
-    
-    for track_name in track_names:
-        for track in all_tracks:
-            found = False
-            if track_name == track['name']:
-                print(track['name'])
-                track_uris.append(track['id'])
-                found = True
-                break
-        if found is False:
-            not_found_tracks.append(track_name)
-    
-    for artist_name in not_found_artists:
-        name = replace_runs_of_whitespace(artist_name)
-        searches = sp.search(q=name, type="artist")
-        if len(searches['artists']['items']) > 0:
-            artist_uris.append(searches['artists']['items'][0]['uri'])
+    artist_uris, not_found_artists = searchArtistUrisFromList(artist_names, all_tracks)
+    track_uris, not_found_tracks = searchTrackUrisFromList(track_names, all_tracks)
 
+    if len(not_found_artists) > 0:
+        artist_uris = artist_uris + searchArtistUris(artist_names, sp)
+    
+    if len(not_found_tracks) > 0:
+        tracks_uris = track_uris + searchTrackUris(track_names, sp)
 
     av_genres = getAvailableGenresOnly(genre_names)
     result_uris = set()
+    tabs = {}
+
     max_limit = 100
     remaining = amount
     recommend = True 
     
+    cycles = 0
+    cycles_limit = 25
+
     while(recommend):
-        limit = max_limit
+        cycles += 1    
         try:
-            recs = sp.recommendations(seed_tracks=track_uris, seed_genres=av_genres ,seed_artists=artist_uris, limit=limit)
+            recs = sp.recommendations(seed_tracks=track_uris, seed_genres=av_genres ,seed_artists=artist_uris, limit=max_limit)
         except:
             return False
             break
@@ -320,101 +406,34 @@ def getTrackRecommendationUris(artist_names, genre_names, track_names, all_track
                 track_uri = track['uri']
                 print(track['name'],end="->")
                 print(track['artists'][0]['name'])
-                result_uris.add(track_uri)
-                if len(result_uris) >= amount:
-                    recommend = False
-                    break
-        print(len(result_uris))
-        
-    return result_uris
 
-
-def getTabTrackRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp):
-
-    artist_uris = []
-    track_uris = []
-
-    not_found_artists = []
-    not_found_tracks = []
-    ''' first check through saved/top tracks before accessing sp.search '''
-
-    ''' loop through artist names '''
-    for artist_name in artist_names:
-        for track in all_tracks:
-            artists = track['artists']
-            found = False
-            for artist in artists:
-                if artist_name == artist['name']:
-                    artist_uris.append(artist['uri'])
-                    print(artist['name'])
-                    found = True
-                    break
-            if found is True:
-                break
-        if found is False:
-            not_found_artists.append(artist_name)
-    
-    ''' loop through track names '''
-    for track_name in track_names:
-        for track in all_tracks:
-            found = False
-            if track_name == track['name']:
-                print(track['name'])
-                track_uris.append(track['id'])
-                found = True
-                break
-        if found is False:
-            not_found_tracks.append(track_name)
-    
-    for artist_name in not_found_artists:
-        name = replace_runs_of_whitespace(artist_name)
-        searches = sp.search(q=name, type="artist")
-        if len(searches['artists']['items']) > 0:
-            artist_uris.append(searches['artists']['items'][0]['uri'])
-
-    # for track_name in not_found_tracks:
-    #     name = replace_runs_of_whitespace(track_name)
-    #     searches = sp.search(q=name, type="track")
-    #     if len(searches['tracks']['items']) > 0:
-    #         track_uris.append(searches['tracks']['items'][0]['uri'])
-
-    
-    av_genres = getAvailableGenresOnly(genre_names)
-    result_uris = set()
-    tabs = {}
-
-    max_limit = 100
-    remaining = amount
-    recommend = True 
-    
-    while(recommend):
-        limit = max_limit
-        
-        try:
-            recs = sp.recommendations(seed_tracks=track_uris, seed_genres=av_genres ,seed_artists=artist_uris, limit=limit)
-        except:
-            return False, False
-            break
-        else:
-            rec_tracks = recs['tracks']
-            for track in rec_tracks:
-                track_uri = track['uri']
-                print(track['name'],end="->")
-                print(track['artists'][0]['name'])
-
-                track_tablink = songsterr.searchForTabLink(track['artists'][0]['name'], track['name'])
-                print(track_tablink)
-                if track_tablink != False:
-                    output_name = track['name'] + " - " + track['artists'][0]['name']
-                    tabs[output_name] = track_tablink
-                    
+                if tab_state is True:
+                    track_tablink = songsterr.searchForTabLink(track['artists'][0]['name'], track['name'])
                     print(track_tablink)
+                    if track_tablink != False:
+                        output_name = track['name'] + " - " + track['artists'][0]['name']
+                        tabs[output_name] = track_tablink
+                    else:
+                        continue        # skip adding if tab could not be found
+
+                if unique_state is True:
+                    unique = checkUniqueFromList(track_uri, all_tracks)
+                    if unique is True:
+                        result_uris.add(track_uri)
+                else:
                     result_uris.add(track_uri)
 
                 if len(result_uris) >= amount:
                     recommend = False
                     break
-    
-        print(len(result_uris)) 
-                
-    return list(result_uris), tabs
+
+        if cycles >= cycles_limit:
+            return False
+            break
+
+        print(len(result_uris))
+
+    if not tab_state:
+        return result_uris
+    else:
+        return list(result_uris), tabs

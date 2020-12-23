@@ -1,7 +1,6 @@
 '''methods to extract data for tracks and genres'''
 import requests
 import spotipy
-import pandas as pd
 import time 
 import random
 
@@ -321,46 +320,6 @@ def getTracksFromPlaylist(url, token):
     
     return all_tracks
 
-
-
-
-
-
-
-''' doing it from requests instead of spotipy; slower, hence not used '''
-def getTrackGenreRequest(track, access_token):
-    headers = {
-        'Authorization': 'Bearer {token}'.format(token=access_token)
-    }
-    genres = set()
-    artists = track['artists']
-    for artist in artists:
-        response = requests.get(artist['href'], headers=headers)
-        content = response.json()
-        artist_genres = content['genres']
-        genres.update(artist_genres)
-
-    return genres
-
-def getTrackGenreDictRequest(tracks, token):
-    all_genres = []
-    result = {}
-    for track in tracks:
-        genres = getTrackGenreRequest(track, token)
-        result[track['uri']] = genres
-        all_genres.extend(genres)
-    return result, all_genres
-
-
-def combineTrackLists(track_lists):
-    result_dict = {}
-    for track_list in track_lists:
-        for track in track_list:
-            if track['id'] not in result_dict:
-                result_dict[track['id']] = track
-
-    result = list(result_dict.values())
-    return result
 
 
 
