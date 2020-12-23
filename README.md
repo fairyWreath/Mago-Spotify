@@ -1,4 +1,4 @@
-# spotify-details
+# Mago - http://mago-spotify.herokuapp.com/
 
 Mago - A simple webapp to view, analyze and organize your spotify tracks and playlists
 Features:
