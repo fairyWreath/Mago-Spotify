@@ -3,7 +3,7 @@ from flask import session, request, redirect, render_template
 import spotipy
 import uuid
 from app import parse
-from app.citrus import mei, yuzu
+from app.citrus import mei
 from app.forms import SingleInputPlaylistForm, RecommendationForm
 from app import app, caches_folder
 from app.client import client_id, client_secret, redirect_uri, scope
@@ -104,22 +104,24 @@ def top_tracks():
     sp = spotipy.Spotify(auth_manager=auth_manager)
     tracks = []            
     time_range = None
-    
-    if request.method == 'POST' and "short-term" in request.form:
-        if session.get('short-top-tracks') is None:
-            parse.parseShortTopTracks(sp)
-        tracks = session['short-top-tracks']
-        time_range = 'short_term'
-    if request.method == 'POST' and "medium-term" in request.form:
-        if session.get('medium-top-tracks') is None:
-            parse.parseMediumTopTracks(sp)
-        tracks =  session['medium-top-tracks']
-        time_range = 'medium_term'
-    if request.method == 'POST' and "long-term" in request.form:
-        if session.get('long-top-tracks') is None:
-           parse.parseLongTopTracks(sp)
-        tracks = session['long-top-tracks']
-        time_range = 'long_term'
+
+    if request.method == 'POST':
+        if "short-term" in request.form:
+            if session.get('short-top-tracks') is None:
+                parse.parseShortTopTracks(sp)
+            tracks = session['short-top-tracks']
+            time_range = 'short_term'
+        elif  "medium-term" in request.form:
+            if session.get('medium-top-tracks') is None:
+                parse.parseMediumTopTracks(sp)
+            tracks =  session['medium-top-tracks']
+            time_range = 'medium_term'
+        elif  "long-term" in request.form:
+            if session.get('long-top-tracks') is None:
+                parse.parseLongTopTracks(sp)
+            tracks = session['long-top-tracks']
+            time_range = 'long_term'
+
     return render_template('tracks_list.html', tracks=tracks, time_range=time_range, user=session['user'])
 
 @app.route('/user/top-genres', methods=['GET', 'POST'])
@@ -132,81 +134,80 @@ def top_genres():
     genre_count = []
     basis = None
     
-    if request.method == 'POST' and "saved-library" in request.form:
-        if session.get('saved-library-tracks') is None:
-            parse.parseSavedLibraryTracks(sp)
-        if session.get('saved-library-genres-all') is None:
-            parse.parseTopGenresFromSavedLibrary(sp)
-        genre_count =  session['top-genres-from-saved-library']
-        basis = 'saved-library'
+    if request.method == 'POST':
+        if 'saved-library' in request.form:
+            if session.get('saved-library-tracks') is None:
+                parse.parseSavedLibraryTracks(sp)
+            if session.get('top-genres-from-saved-library') is None:
+                parse.parseTopGenresFromSavedLibrary(sp)
+            genre_count =  session['top-genres-from-saved-library']
+            basis = 'saved-library' 
+        elif 'all-playlist' in request.form:
+            if session.get('all-playlist-tracks') is None:
+                token = auth_manager.get_access_token(as_dict=False)
+                parse.parseAllPlaylistTracks(sp, token)
+            if session.get('top-genres-from-all-playlist') is None:    
+                parse.parseTopGenresFromAllPlaylists(sp)
+            genre_count = session['top-genres-from-all-playlist']
+            basis = 'all-playlist'    
+        elif 'combined' in request.form:
+            if session.get('combined-library-playlist-tracks') is None:
+                token = auth_manager.get_access_token(as_dict=False)
+                parse.parseCombinedTracks(sp, token)
+            if session.get('combined-track-genre-dict') is None:
+                parse.parseCombinedTrackGenreDict(sp)
+            if session.get('top-genres-from-combined') is None:
+                parse.parseTopGenresFromCombined()
+            genre_count = session['top-genres-from-combined']
+            basis = 'combined'                             
 
-    if request.method == 'POST' and 'all-playlist' in request.form:
-        if session.get('all-playlist-tracks') is None:
-            token = auth_manager.get_access_token(as_dict=False)
-            parse.parseAllPlaylistTracks(sp, token)
-        if session.get('all-playlist-genres-all') is None:    
-            parse.parseTopGenresFromAllPlaylists(sp)
-        genre_count = session['top-genres-from-all-playlist']
-        basis = 'all-playlist'
+        elif 'long-top' in request.form:
+            if session.get('long-top-tracks') is None:
+                parse.parseLongTopTracks(sp)
+            if session.get('long-top-genres-all') is None:
+                parse.parseTopGenresFromLongTop(sp)
+            genre_count = session['top-genres-from-long-top']
+            basis = 'long-top'
 
-    if request.method == 'POST' and 'combined' in request.form:
-        if session.get('combined-library-playlist-tracks') is None:
-            token = auth_manager.get_access_token(as_dict=False)
-            parse.parseCombinedTracks(sp, token)
-        if session.get('combined-track-genre-dict') is None:
-            parse.parseCombinedTrackGenreDict(sp)
-        if session.get('top-genres-from-combined') is None:
-            parse.parseTopGenresFromCombined()
-        genre_count = session['top-genres-from-combined']
-        basis = 'combined'
+        elif 'medium-top' in request.form:
+            if session.get('medium-top-tracks') is None:
+                parse.parseMediumTopTracks(sp)
+            if session.get('medium-top-genres-all') is None:
+                parse.parseTopGenresFromMediumTop(sp)
+            genre_count = session['top-genres-from-medium-top']
+            basis = 'medium-top'
 
-    if request.method == 'POST' and 'long-top' in request.form:
-        if session.get('long-top-tracks') is None:
-            parse.parseLongTopTracks(sp)
-        if session.get('long-top-genres-all') is None:
-            parse.parseTopGenresFromLongTop(sp)
-        genre_count = session['top-genres-from-long-top']
-        basis = 'long-top'
+        elif 'short-top' in request.form:
+            if session.get('short-top-tracks') is None:
+                parse.parseShortTopTracks(sp)
+            if session.get('short-top-genres-all') is None:
+                parse.parseTopGenresFromShortTop(sp)
+            genre_count = session['top-genres-from-short-top']
+            basis = 'short-top'
 
-    if request.method == 'POST' and 'medium-top' in request.form:
-        if session.get('medium-top-tracks') is None:
-            parse.parseMediumTopTracks(sp)
-        if session.get('medium-top-genres-all') is None:
-            parse.parseTopGenresFromMediumTop(sp)
-        genre_count = session['top-genres-from-medium-top']
-        basis = 'medium-top'
+        elif 'long-artist' in request.form:
+            if session.get('long-top-artists') is None:
+                parse.parseLongTopArtists(sp)
+            if session.get('long-artist-genres-all') is None:
+                parse.parseTopGenresFromLongArtist(sp)
+            genre_count = session['top-genres-from-long-artist']
+            basis = 'long-artist'
 
-    if request.method == 'POST' and 'short-top' in request.form:
-        if session.get('short-top-tracks') is None:
-            parse.parseShortTopTracks(sp)
-        if session.get('short-top-genres-all') is None:
-            parse.parseTopGenresFromShortTop(sp)
-        genre_count = session['top-genres-from-short-top']
-        basis = 'short-top'
+        elif 'medium-artist' in request.form:
+            if session.get('medium-top-artists') is None:
+                parse.parseMediumTopArtists(sp)
+            if session.get('medium-artist-genres-all') is None:
+                parse.parseTopGenresFromMediumArtist(sp)
+            genre_count = session['top-genres-from-medium-artist']
+            basis = 'medium-artist'
 
-    if request.method == 'POST' and 'long-artist' in request.form:
-        if session.get('long-top-artists') is None:
-            parse.parseLongTopArtists(sp)
-        if session.get('long-artist-genres-all') is None:
-            parse.parseTopGenresFromLongArtist(sp)
-        genre_count = session['top-genres-from-long-artist']
-        basis = 'long-artist'
-
-    if request.method == 'POST' and 'medium-artist' in request.form:
-        if session.get('medium-top-artists') is None:
-            parse.parseMediumTopArtists(sp)
-        if session.get('medium-artist-genres-all') is None:
-            parse.parseTopGenresFromMediumArtist(sp)
-        genre_count = session['top-genres-from-medium-artist']
-        basis = 'medium-artist'
-
-    if request.method == 'POST' and 'short-artist' in request.form:
-        if session.get('short-top-artists') is None:
-            parse.parseShortTopArtists(sp)
-        if session.get('short-artist-genres-all') is None:
-            parse.parseTopGenresFromShortArtist(sp)
-        genre_count = session['top-genres-from-short-artist']
-        basis = 'short-artist'
+        elif 'short-artist' in request.form:
+            if session.get('short-top-artists') is None:
+                parse.parseShortTopArtists(sp)
+            if session.get('short-artist-genres-all') is None:
+                parse.parseTopGenresFromShortArtist(sp)
+            genre_count = session['top-genres-from-short-artist']
+            basis = 'short-artist'
 
     return render_template('top_genres.html', counts=genre_count, basis=basis, user=session['user'])
 
@@ -220,55 +221,50 @@ def top_artists():
     basis = None
     counted = False
 
-    if request.method == 'POST' and 'short-term' in request.form:
-        if session.get('short-top-artists-name') is None:
-            parse.parseShortTopArtistsName(sp)
-        artists = session['short-top-artists-name']
-        basis = 'short-term'
-
-    if request.method == 'POST' and 'medium-term' in request.form:
-        if session.get('medium-top-artists-name') is None:
-           parse.parseMediumTopArtistsName(sp)
-        artists = session['medium-top-artists-name']
-        basis = 'medium-term'
-
-    if request.method == 'POST' and 'long-term' in request.form:
-        if session.get('long-top-artists-name') is None:
-            parse.parseLongTopArtistsName(sp)
-        artists = session['long-top-artists-name']
-        basis = 'long-term'
-
-    if request.method == 'POST' and 'saved-library' in request.form:
-        if session.get('top-artists-from-library') is None:
-            if session.get('saved-library-tracks') is None:
-                parse.parseSavedLibraryTracks(sp)
-            parse.parseTopArtistsFromSavedLibrary(sp)
-        artists = session['top-artists-from-library']
-        basis = 'saved-library'
-        counted = True
-
-    if request.method == 'POST' and 'all-playlist' in request.form:
-        if session.get('top-artists-from-playlist') is None:
-            tracks = []
-            if session.get('all-playlist-tracks') is None:
+    if request.method == 'POST':
+        if 'short-term' in request.form:
+            if session.get('short-top-artists-name') is None:
+                parse.parseShortTopArtistsName(sp)
+            artists = session['short-top-artists-name']
+            basis = 'short-term'
+        elif 'medium-term' in request.form:
+            if session.get('medium-top-artists-name') is None:
+                parse.parseMediumTopArtistsName(sp)
+            artists = session['medium-top-artists-name']
+            basis = 'medium-term'
+        elif 'long-term' in request.form:
+            if session.get('long-top-artists-name') is None:
+                parse.parseLongTopArtistsName(sp)
+            artists = session['long-top-artists-name']
+            basis = 'long-term'
+        elif 'saved-library' in request.form:
+            if session.get('top-artists-from-library') is None:
+                if session.get('saved-library-tracks') is None:
+                    parse.parseSavedLibraryTracks(sp)
+                parse.parseTopArtistsFromSavedLibrary(sp)
+            artists = session['top-artists-from-library']
+            basis = 'saved-library'
+            counted = True
+        elif 'all-playlist' in request.form:
+            if session.get('top-artists-from-playlist') is None:
+                if session.get('all-playlist-tracks') is None:
+                    token = auth_manager.get_access_token(as_dict=False)
+                    parse.parseAllPlaylistTracks(sp, token)
+                parse.parseTopArtistFromPlaylist(sp)
+            artists = session['top-artists-from-playlist']
+            basis = 'all-playlist'
+            counted = True
+        elif 'combined' in request.form:
+            if session.get('combined-library-playlist-tracks') is None:
                 token = auth_manager.get_access_token(as_dict=False)
-                parse.parseAllPlaylistTracks(sp, token)
-            parse.parseTopArtistFromPlaylist(sp)
-        artists = session['top-artists-from-playlist']
-        basis = 'all-playlist'
-        counted = True
-
-    if request.method == 'POST' and 'combined' in request.form:
-        if session.get('combined-library-playlist-tracks') is None:
-            token = auth_manager.get_access_token(as_dict=False)
-            parse.parseCombinedTracks(sp, token)
-        if session.get('combined-track-artist-dict') is None:
-            parse.parseCombinedTrackArtistDict()
-        if session.get('top-artists-from-combined') is None:
-            parse.parseTopArtistsFromCombined()
-        artists = session['top-artists-from-combined']
-        basis = 'combined'
-        counted = True
+                parse.parseCombinedTracks(sp, token)
+            if session.get('combined-track-artist-dict') is None:
+                parse.parseCombinedTrackArtistDict()
+            if session.get('top-artists-from-combined') is None:
+                parse.parseTopArtistsFromCombined()
+            artists = session['top-artists-from-combined']
+            basis = 'combined'
+            counted = True
 
     return render_template('top_artists.html', counts=artists, basis=basis , counted=counted, user=session['user']) 
 
@@ -281,53 +277,103 @@ def create_playlists():
     form = SingleInputPlaylistForm()
     message = None
 
-    if request.method == 'POST' and 'track-artist' in request.form:
-        if session.get('saved-library-tracks') is None:
-            parse.parseSavedLibraryTracks(sp)
-        if session.get('library-artists-track-artist-dict') is None:
-            parse.parseLibraryTrackArtistDict()
-        track_artist_dict = session['library-artists-track-artist-dict']
-        artist = form.input.data
-        print(form.input.data)
-        playlist_name = form.name.data
-        print(form.name.data)
-        uris = mei.getUrisFromSaved(track_artist_dict, artist)
-        mei.createPlaylistFromUris(uris, sp, playlist_name)
+    if request.method == 'POST':
+        data_dict = dict()
 
-    if request.method == 'POST' and 'track-genre' in request.form:
-        if session.get('saved-library-tracks') is None:
-            parse.parseSavedLibraryTracks(sp)
-        if session.get('saved-library-track-genre-dict') is None:
-            parse.parseLibraryGenreDict()
-        genre = form.input.data
-        playlist_name = form.name.data
-        uris = mei.getUrisFromSaved(track_genre_dict, genre)
-        mei.createPlaylistFromUris(uris, sp, playlist_name)
+        if 'track-artist' in request.form  or 'track-genre' in request.form:
+            print('nn')
+            if session.get('saved-library-tracks') is None:
+                parse.parseSavedLibraryTracks(sp)
+            if 'track-artist' in request.form:
+                if session.get('library-artists-track-artist-dict') is None:
+                    parse.parseLibraryTrackArtistDict()
+                print('track-artist')
+                data_dict = session['library-artists-track-artist-dict']
+            elif 'track-genre' in request.form:
+                if session.get('saved-library-track-genre-dict') is None:
+                    parse.parseLibraryTrackGenreDict(sp)
+                print('track-genre')
+                data_dict = session['saved-library-track-genre-dict']
+        elif 'combined-track-artist' in request.form or 'combined-track-genre' in request.form:
+            print('ZZZz')
+            if session.get('combined-library-playlist-tracks') is None:
+                token = auth_manager.get_access_token(as_dict=False)
+                print('parse combined')
+                parse.parseCombinedTracks(sp, token)
+            print('ZZZz')
+            print(len(session['combined-library-playlist-tracks']))
+            if 'combined-track-artist' in request.form:
+                if session.get('combined-track-artist-dict') is None:
+                    parse.parseCombinedTrackArtistDict()
+                print('artist combined')
+                data_dict = session['combined-track-artist-dict']
+            elif 'combined-track-genre' in request.form:
+                if session.get('combined-track-genre-dict') is None:
+                    parse.parseCombinedTrackGenreDict(sp)
+                print('genre combined') 
+                data_dict = session['combined-track-genre-dict'] 
 
-    if request.method == 'POST' and 'combined-track-artist' in request.form:
-        if session.get('combined-library-playlist-tracks') is None:
-            token = auth_manager.get_access_token(as_dict=False)
-            parse.parseCombinedTracks(sp, token)
-        if session.get('combined-track-artist-dict') is None:
-            token = auth_manager.get_access_token(as_dict=False)
-            parse.parseCombinedTrackArtistDict()
-        track_artist_dict = session['combined-track-artist-dict']
-        artist = form.input.data
+        data = form.input.data      # artist or genre name
         playlist_name = form.name.data
-        uris = mei.getUrisFromSaved(track_artist_dict, artist)
-        mei.createPlaylistFromUris(uris, sp, playlist_name)
+        print(len(data_dict))
+        # print(data_dict)
+        uris = mei.getUrisFromSaved(data_dict, data)
+        print(len(uris))
+        print('aaaa')
+        print(data)
+        if len(uris) == 0:
+            print('keyword not found')
+        else:
+            mei.createPlaylistFromUris(uris, sp, playlist_name)
 
-    if request.method == 'POST' and 'combined-track-genre' in request.form:
-        if session.get('combined-library-playlist-tracks') is None:
-            token = auth_manager.get_access_token(as_dict=False)
-            parse.parseCombinedTracks(sp, token)
-        if session.get('combined-track-genre-dict') is None:
-            parse.parseCombinedTrackGenreDict(sp)
-        track_genre_dict = session['combined-track-genre-dict']
-        genre = form.input.data
-        playlist_name = form.name.data
-        uris = mei.getUrisFromSaved(track_genre_dict, genre)
-        mei.createPlaylistFromUris(uris, sp, playlist_name)
+    # if request.method == 'POST' and 'track-artist' in request.form:
+    #     if session.get('saved-library-tracks') is None:
+    #         parse.parseSavedLibraryTracks(sp)
+    #     if session.get('library-artists-track-artist-dict') is None:
+    #         parse.parseLibraryTrackArtistDict()
+    #     track_artist_dict = session['library-artists-track-artist-dict']
+    #     artist = form.input.data
+    #     print(form.input.data)
+    #     playlist_name = form.name.data
+    #     print(form.name.data)
+    #     uris = mei.getUrisFromSaved(track_artist_dict, artist)
+    #     mei.createPlaylistFromUris(uris, sp, playlist_name)
+
+    # if request.method == 'POST' and 'track-genre' in request.form:
+    #     if session.get('saved-library-tracks') is None:
+    #         parse.parseSavedLibraryTracks(sp)
+    #     if session.get('saved-library-track-genre-dict') is None:
+    #         parse.parseLibraryGenreDict()
+    #     track_genre_dict = session['saved-library-track-genre-dict']
+    #     genre = form.input.data
+    #     playlist_name = form.name.data
+    #     uris = mei.getUrisFromSaved(track_genre_dict, genre)
+    #     mei.createPlaylistFromUris(uris, sp, playlist_name)
+
+    # if request.method == 'POST' and 'combined-track-artist' in request.form:
+    #     if session.get('combined-library-playlist-tracks') is None:
+    #         token = auth_manager.get_access_token(as_dict=False)
+    #         parse.parseCombinedTracks(sp, token)
+    #     if session.get('combined-track-artist-dict') is None:
+    #         token = auth_manager.get_access_token(as_dict=False)
+    #         parse.parseCombinedTrackArtistDict()
+    #     track_artist_dict = session['combined-track-artist-dict']
+    #     artist = form.input.data
+    #     playlist_name = form.name.data
+    #     uris = mei.getUrisFromSaved(track_artist_dict, artist)
+    #     mei.createPlaylistFromUris(uris, sp, playlist_name)
+
+    # if request.method == 'POST' and 'combined-track-genre' in request.form:
+    #     if session.get('combined-library-playlist-tracks') is None:
+    #         token = auth_manager.get_access_token(as_dict=False)
+    #         parse.parseCombinedTracks(sp, token)
+    #     if session.get('combined-track-genre-dict') is None:
+    #         parse.parseCombinedTrackGenreDict(sp)
+    #     track_genre_dict = session['combined-track-genre-dict']
+    #     genre = form.input.data
+    #     playlist_name = form.name.data
+    #     uris = mei.getUrisFromSaved(track_genre_dict, genre)
+    #     mei.createPlaylistFromUris(uris, sp, playlist_name)
 
     return render_template('create_playlist.html', form=form, user=session['user'])
 
@@ -341,54 +387,30 @@ def get_recommendations():
     message = None
     tabs = None
 
-    if request.method == 'POST' and form.validate() and 'normal' in request.form:
-        # if session.get('combined-library-playlist-tracks') is None:
-        #     token = auth_manager.get_access_token(as_dict=False)
-        #     parse.parseCombinedTracks(sp, token)
-        # all_tracks = session['combined-library-playlist-tracks']
+    if request.method == 'POST' and form.validate():
+        all_tracks = []
+        if session.get('combined-library-playlist-tracks') is not None:     # get all track list data if they are available
+            all_tracks = session['combined-library-playlist-tracks']
         all_tracks = []
         artist_names = form.artists.data.split(",")
         genre_names = form.genres.data.split(",")
         track_names = form.tracks.data.split(",")
-        print(artist_names)
-        print(track_names)
         playlist_name = form.name.data
         amount = form.amount.data
         uris = None
-        if form.unique.data is True:
-            print('UNIQUE')
-            uris = mei.getUniqueTrackRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp)
-        else:
-            print('NOT UNIQUE')
-            uris = mei.getTrackRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp)
-        if uris is not False:
-            uris = list(uris)
-            print(len(uris))
-            mei.createPlaylistFromUris(uris, sp, playlist_name)
-            message = "Playlist '{}' successfully created".format(playlist_name)
-        else:
-            message = "Recommendations could not be generated: Some artists/tracks may be incompatible"
-        
+        if 'normal' in request.form:
+            if form.unique.data is True:
+                uris = mei.getRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp, True)
+            else:
+                uris = mei.getRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp)
+        else:       # for tabs
+            if form.unique.data is True:
+                uris, tabs = mei.getRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp, True, True)
+            else:
+                uris, tabs = mei.getRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp, tab_state=True)
 
-    if request.method == 'POST' and form.validate() and 'tabs' in request.form:
-        # if session.get('combined-library-playlist-tracks') is None:
-        #     token = auth_manager.get_access_token(as_dict=False)
-        #     parse.parseCombinedTracks(sp, token)
-        # all_tracks = session['combined-library-playlist-tracks']
-        all_tracks = []
-        artist_names = form.artists.data.split(",")
-        genre_names = form.genres.data.split(",")
-        track_names = form.tracks.data.split(",")
-        playlist_name = form.name.data
-        amount = form.amount.data
-        uris = None
-        if form.unique.data is True:
-            uris, tabs = mei.getRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp, True, True)
-        else:
-            uris, tabs = mei.getRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp, tab_state=True)
         if uris is not False:
             uris = list(uris)
-            print(len(uris))
             mei.createPlaylistFromUris(uris, sp, playlist_name)
             message = "Playlist '{}' successfully created".format(playlist_name)
         else:

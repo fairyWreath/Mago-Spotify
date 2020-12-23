@@ -51,6 +51,8 @@ def getTrackGenreFromAlbum(track, sp):
  
 def getTrackGenreFromArtist(track, sp):
     genres = set()
+    print(track['name'], end=" -> ")
+    print(track['artists'][0]['name'])
     artists = track['artists']
     for artist in artists:
         artist_id = artist['id']
@@ -107,6 +109,7 @@ def getUserSavedTracksList(sp):
         if track_items:
             for item in track_items:
                 track = item['track']
+                print(track['name'])
                 all_tracks.append(track)
             offset += 50
         else:
@@ -196,6 +199,19 @@ def getTrackGenreDict(tracks, sp):
         all_genres.extend(genres)
     return result, all_genres
 
+''' get a genre dict, but first finds it in another dict, if not found then make an API call '''
+def getTrackGenreDictWithOther(tracks, genre_dict, sp):
+    all_genres = []
+    result = {}
+    for track in tracks:
+        if track['uri'] in genre_dict:          #uri is the key
+            result[track['uri']] = genre_dict[track['uri']]
+            all_genres.extend(genre_dict[track['uri']])
+        else:
+            genres = getTrackGenreFromArtist(track, sp)
+            result[track['uri']] = genres
+            all_genres.extend(genres)
+    return result, all_genres
 
 
 ''' for artists '''
@@ -220,16 +236,22 @@ def getTrackArtistDict(tracks):
 # ''' only your owned playlists
 def getTracksFromAllPlaylists(sp, token):
 
+    print("GET ALL TRACKS FROM ALL PLAYLISTS")
+
     max_limit = 50          # limit for both getting the playlists and getting the tracks in a playlist
+    playlist_offset = 0
     playlists = []
     all_reached = False
 
     while all_reached is False:
-        plays = sp.current_user_playlists(limit=max_limit)
+        plays = sp.current_user_playlists(limit=max_limit, offset=playlist_offset)
         items = plays['items']
+        print(len(items))
         playlists.extend(items)
-        if len(items) < max_limit:
+        if len(items) < max_limit:      #less than 50 means all playlists has been grabbed
             all_reached = True
+        else:
+            playlist_offset = playlist_offset + max_limit
 
     user_id = sp.current_user()['id']
     
@@ -258,8 +280,9 @@ def getTracksFromAllPlaylists(sp, token):
                 items = content['items']
                 for item in items:
                     if item['track']['id'] not in all_tracks_dict:
+                        print(item['track']['name'])
                         all_tracks_dict[item['track']['id']] = item['track']
-          
+
                 if len(items) < max_limit:
                     reached = True
                 
@@ -319,6 +342,18 @@ def getTracksFromPlaylist(url, token):
         offset += max_limit
     
     return all_tracks
+
+def combineTrackLists(track_lists):
+    result_dict = {}
+    for track_list in track_lists:
+        for track in track_list:
+            if track['id'] not in result_dict:
+                result_dict[track['id']] = track
+
+    result = list(result_dict.values())
+    return result
+
+
 
 
 

@@ -37,7 +37,8 @@ def parseSavedLibraryTracks(sp):
 
 def parseTopGenresFromSavedLibrary(sp):
     tracks = session['saved-library-tracks']
-    session['saved-library-track-genre-dict'], session['saved-library-genres-all'] = nago.getTrackGenreDict(tracks, sp)
+    if session['saved-library-genres-all'] is None:
+        session['saved-library-track-genre-dict'], session['saved-library-genres-all'] = nago.getTrackGenreDict(tracks, sp)
     counts = nago.getCount(session['saved-library-genres-all'])
     sorted_counts = nago.sortCount(counts)
     session['top-genres-from-saved-library'] = sorted_counts
@@ -138,9 +139,8 @@ def parseTopArtistsFromCombined():
     session['top-artists-from-combined'] = nago.sortCount(counts)
 
 ''' parse dicts to create playlists '''
-def parseLibraryTrackGenreDict():
+def parseLibraryTrackGenreDict(sp):
     tracks = session['saved-library-tracks']
-    # tracks = nago.limitSavedTracks(tracks, 100)
     session['saved-library-track-genre-dict'], session['saved-library-genres-all'] = nago.getTrackGenreDict(tracks, sp)
 
 def parseLibraryTrackArtistDict():
@@ -149,7 +149,10 @@ def parseLibraryTrackArtistDict():
 
 def parseCombinedTrackGenreDict(sp):
     tracks = session['combined-library-playlist-tracks']
-    session['combined-track-genre-dict'], session['combined-genres-all'] = nago.getTrackGenreDict(tracks, sp)
+    if session.get('saved-library-track-genre-dict') is not None:       # use help of saved-library dict if available
+        session['combined-track-artist-dict'], session['combined-artists-all'] = nago.getTrackGenreDictWithOther(tracks, session['saved-library-track-genre-dict'], sp)
+    else:    
+        session['combined-track-genre-dict'], session['combined-genres-all'] = nago.getTrackGenreDict(tracks, sp)
 
 def parseCombinedTrackArtistDict():
     tracks = session['combined-library-playlist-tracks']

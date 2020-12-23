@@ -8,8 +8,8 @@
 <nav class="navbar navbar-expand-md fixed-top" style="background-color: black;">
     <a class="navbar-brand title-text" href="{{ url_for('index') }}">Mago</a>
     <div class="container">
-        <div class="collapse navbar-collapse normal-text-navbar" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav normal-text-navbar">
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
                 <li><a href="{{ url_for('top_tracks') }}" class="normal-text-navbar">Top Tracks</a></li>
                 <li><a href="{{ url_for('top_genres') }}" class="normal-text-navbar">Top Genres</a></li>
                 <li><a href="{{ url_for('top_artists') }}" class="normal-text-navbar">Top Artists</a></li>
@@ -17,9 +17,9 @@
                 <li><a href="{{ url_for('get_recommendations') }}" class="normal-text-navbar">Recommendations</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right normal-text-navbar">
-                    <li><img alt="Profile" class="profile-nav-img" src="{{ user['image'] }}"></li>
-                    <li><a href="{{ url_for('index') }}">{{ user['name'] }}</a></li>
-                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                    <li><img alt="Profile" class="profile-nav-img" src="{{ user['image'] }}" class="normal-text-navbar"></li>
+                    <li><a href="{{ url_for('index') }}" class="normal-text-navbar">{{ user['name'] }}</a></li>
+                    <li><a href="{{ url_for('logout') }}" class="normal-text-navbar">Logout</a></li>
             </ul>
         </div>
     </div>

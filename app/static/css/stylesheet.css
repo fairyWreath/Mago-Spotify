@@ -30,6 +30,12 @@
     margin-bottom: 25px;
 }
 
+.form-container {
+    margin-left: 200px;
+    margin-right: 200px;
+}
+
+
 .info-jumbotron {
     padding-top: 5px;
     padding-bottom: 5px;
@@ -41,11 +47,14 @@
 }
 
 .form-jumbotron {
-    /* margin-left: 200px;
-    margin-right: 200px; */
+    margin-left: 10px;
+    margin-right: 10px; 
     padding-top: 5px;
     padding-bottom: 5px;
+    padding-left: 200px;
+    padding-right: 200px;
     width: 1000px;
+    margin: 0 auto;
     margin: 0 auto;
 }
 
@@ -72,15 +81,16 @@
     padding-bottom: 5px;
     padding-left: 5px;
     padding-right: 5px;
-    /* background-color: #f9e2f9; */
     background-color: #fbeefb;
     width: 1000px;
-    /* height: 500px; */
     margin: 0 auto;
 }
 
 .profile-name {
+    font-family: 'Tangerine', cursive;
+    color: #64d4c7;
     padding-left: 0px;
+    font-size: 48px;
 }
 
 .profile-img {
@@ -94,7 +104,6 @@
 .profile-text {
     font-family: 'Overlock', cursive;
     font-size: 18px;
-    /*color: black;*/
     padding-left: 20px;
     padding-bottom: 5px;
     margin: 8px;
@@ -103,7 +112,7 @@
 .normal-text-navbar {
     font-family: 'Overlock', cursive;
     color: #e472bf;
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .normal-text{
