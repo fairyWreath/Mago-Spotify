@@ -9,7 +9,7 @@
     <form action="" method="POST">
         {{ form.csrf_token() }}
         <div class="container info-container"> 
-            <div class="jumbotron form-jumbotron">
+            <div class="jumbotron  form-jumbotron">
                 <h2 class="info-lead section-header">Organize Your Playlist</h2>
                 <h3 class="normal-text">Create a unique playlist of a single track or genre, based on all the tracks
                     on your saved library and your playlists
@@ -40,7 +40,7 @@
     </form>
 
     {% if message %}
-    <div class="container text-center info-container normal-text">
+    <div class="container text-center jumbotron-fluid info-container normal-text">
         <div class="jumbotron info-jumbotron">
         <h3 class="info-lead"> {{ message }}</h3>
 
