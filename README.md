@@ -1,7 +1,9 @@
 # Mago - 
 
 Mago - A simple webapp to view, analyze and organize your spotify tracks and playlists
+
 Deployed on Heroku -http://mago-spotify.herokuapp.com/
+
 Features:
   - View your top tracks, artists and genres
   - Different methods exist to calculate your top tracks and artists:
