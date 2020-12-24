@@ -1,4 +1,4 @@
-# Mago - 
+# Mago - Spotify
 
 Mago - A simple webapp to view, analyze and organize your spotify tracks and playlists
 
