@@ -3,7 +3,7 @@ from flask import session, request, redirect, render_template
 import spotipy
 import uuid
 from app import parse
-from app.citrus import mei
+from app.api_requests import spotify
 from app.forms import SingleInputPlaylistForm, RecommendationForm
 from app import app, caches_folder
 from app.client import client_id, client_secret, redirect_uri, scope
@@ -303,11 +303,11 @@ def create_playlists():
 
         data = form.input.data      # artist or genre name
         playlist_name = form.name.data
-        uris = mei.getUrisFromSaved(data_dict, data)
+        uris = spotify.getUrisFromSaved(data_dict, data)
         if len(uris) == 0:
             message = "No tracks of the given artist/genre found"
         else:
-            mei.createPlaylistFromUris(uris, sp, playlist_name)
+            spotify.createPlaylistFromUris(uris, sp, playlist_name)
             message = "Playlist {} succesfully created".format(playlist_name)
 
     return render_template('create_playlist.html', form=form, user=session['user'], message=message)
@@ -334,18 +334,18 @@ def get_recommendations():
         uris = None
         if 'normal' in request.form:
             if form.unique.data is True:
-                uris = mei.getRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp, True)
+                uris = spotify.getRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp, True)
             else:
-                uris = mei.getRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp)
+                uris = spotify.getRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp)
         else:       # for tabs
             if form.unique.data is True:
-                uris, tabs = mei.getRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp, True, True)
+                uris, tabs = spotify.getRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp, True, True)
             else:
-                uris, tabs = mei.getRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp, tab_state=True)
+                uris, tabs = spotify.getRecommendationUris(artist_names, genre_names, track_names, all_tracks, amount, sp, tab_state=True)
 
         if uris is not False:
             uris = list(uris)
-            mei.createPlaylistFromUris(uris, sp, playlist_name)
+            spotify.createPlaylistFromUris(uris, sp, playlist_name)
             message = "Playlist '{}' successfully created".format(playlist_name)
         else:
             message = "Recommendations could not be generated: Some artists/tracks may be incompatible, or seed limit exceeded"
